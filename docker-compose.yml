@@ -1,0 +1,51 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: liger_db
+    environment:
+      POSTGRES_USER: liger_user
+      POSTGRES_PASSWORD: liger_8010
+      POSTGRES_DB: liger_production
+    ports:
+      - "5433:5432"
+    volumes:
+      # pg16 volume — the old pg15 `postgres_data` volume is intentionally
+      # abandoned (prototype data only; real data arrives via P8 importers).
+      - postgres_data_16:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U liger_user"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: liger_redis
+    ports:
+      - "6379:6379"
+
+  # Local S3 for design images / PDFs (P0-T5-02). Real S3/R2 in staging+prod.
+  minio:
+    image: minio/minio:latest
+    container_name: liger_minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: liger_minio
+      MINIO_ROOT_PASSWORD: liger_minio_8010
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+
+  # Catches all outgoing email locally (web UI on :8025)
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: liger_mail
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
+volumes:
+  postgres_data_16:
+  minio_data:

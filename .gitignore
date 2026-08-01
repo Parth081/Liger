@@ -1,0 +1,30 @@
+# Environment variables — secrets never in git (R14)
+backend/.env
+frontend/.env.local
+frontend/.env.development
+frontend/.env.production
+frontend_new/.env.local
+frontend_new/.env*.local
+*.env.backup
+
+# Python
+backend/venv/
+backend/.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+backend/test_liger.db
+backend/alembic_smoke.db
+
+# Node
+frontend/node_modules/
+frontend_new/node_modules/
+frontend_new/.next/
+
+# OS / editor
+.DS_Store
+Thumbs.db

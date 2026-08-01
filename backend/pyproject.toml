@@ -1,0 +1,36 @@
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+filterwarnings = ["ignore::DeprecationWarning"]
+
+[tool.coverage.run]
+branch = true
+source = ["app"]
+omit = ["app/workers/*", "alembic/*", "legacy/*"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+extend-exclude = ["legacy", "alembic/versions", "venv", ".venv"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B", "T20"]  # T20 bans print() (CLAUDE.md DoD)
+# B008: FastAPI Depends() in defaults is idiomatic.
+# N818: domain exceptions are deliberately named after their API error codes
+#       (CreditBlocked, RateNotFound) — see core/exceptions.py.
+ignore = ["B008", "N818"]
+
+[tool.ruff.lint.per-file-ignores]
+# Message bodies are natural language in en/hi/gu — wrapping them would corrupt
+# the text the dealer actually receives.
+"app/modules/notifications/templates.py" = ["E501"]
+# R12: test names cite BR-/R- rule ids verbatim (test_BR_SQFT_02_...).
+# B015: comparisons inside pytest.raises are the point of the test.
+# B017: decode_token intentionally tested against any JWT failure.
+"tests/**" = ["N802", "N806", "B015", "B017"]
+
+[tool.mypy]
+python_version = "3.12"
+ignore_missing_imports = true
+check_untyped_defs = true
+exclude = ["legacy/", "alembic/", "venv/", ".venv/"]
